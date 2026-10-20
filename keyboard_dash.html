@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keyboard Dash</title>
+<style>
+:root{--ink:#10284a;--sky:#62d4ff;--blue:#1587ff;--lime:#41ef62;--pink:#ff4fc8}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;color:white;background:linear-gradient(#39b9f4,#b5f3ff);min-height:100vh;overflow:hidden}
+button{font:inherit;font-weight:800;border:0;border-radius:14px;padding:12px 18px;color:white;background:#177bfa;box-shadow:0 5px 0 #104b9c;cursor:pointer}button:active{transform:translateY(3px);box-shadow:0 2px 0 #104b9c}
+.top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;gap:10px}.logo{font-size:clamp(24px,5vw,48px);font-weight:1000;letter-spacing:1px;text-shadow:3px 4px 0 #163457}.logo span{color:#00f0ff}.stats{background:#102d50d9;border:2px solid #8deaff;border-radius:14px;padding:8px 13px;font-weight:800}
+main{display:grid;grid-template-columns:minmax(180px,250px) 1fr minmax(160px,220px);gap:15px;padding:8px 18px;max-width:1200px;margin:auto}
+.panel{background:#102d50e8;border:2px solid #8deaff;border-radius:18px;padding:16px;box-shadow:0 8px 0 #155d8a66}.menu{display:grid;gap:12px;align-content:start}.menu button{font-size:17px;text-align:left}.menu button:nth-child(1){background:#25c94e;box-shadow:0 5px 0 #11852e}.menu button:nth-child(2){background:#8950ff;box-shadow:0 5px 0 #4e269c}.menu button:nth-child(3){background:#ffae18;box-shadow:0 5px 0 #a55e00}
+.arena{min-height:440px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;border-radius:22px;background:linear-gradient(#53d4ff 0%,#a9f3ff 65%,#66d4ff 100%);border:3px solid #e4fcff;box-shadow:inset 0 -20px 0 #39a9e6}
+.cloud{position:absolute;background:#fff9;border-radius:50%;width:120px;height:40px;filter:blur(1px)}.c1{top:15%;left:6%}.c2{top:30%;right:3%;transform:scale(1.4)}.c3{bottom:18%;left:12%;transform:scale(.8)}
+.track{position:absolute;bottom:0;width:95%;height:66%;display:flex;align-items:end;justify-content:center;gap:7px;transform:perspective(500px) rotateX(16deg)}.tile{height:var(--h);width:14%;min-width:30px;border:3px solid #ffffff88;border-radius:7px 7px 2px 2px;display:flex;justify-content:center;align-items:center;font-size:clamp(18px,3vw,30px);font-weight:1000;text-shadow:0 2px 3px #173c67;box-shadow:0 8px 0 #153b5c44;transition:transform .2s}.tile:nth-child(4n+1){background:#ffcf23}.tile:nth-child(4n+2){background:#24e85b}.tile:nth-child(4n+3){background:#158aff}.tile:nth-child(4n){background:#a35cff}
+.runner{position:absolute;bottom:24%;left:50%;transform:translateX(-50%);font-size:54px;filter:drop-shadow(0 5px 1px #14507866);z-index:2}.prompt{position:absolute;top:18px;left:12px;right:12px;text-align:center;background:#102d50e8;border:2px solid #a6f4ff;border-radius:14px;padding:10px;font-weight:800;z-index:3}.key{font-size:28px;color:#ffdf45}
+.status{font-weight:800;font-size:18px;margin:0 0 12px}.small{font-size:13px;line-height:1.5;color:#d8f6ff}.score{font-size:28px;font-weight:1000;color:#ffdf45}.side h3{margin:2px 0 12px}.side .row{display:flex;justify-content:space-between;border-bottom:1px solid #ffffff28;padding:8px 0;font-size:14px}.bottom{max-width:1200px;margin:10px auto;padding:0 18px;text-align:center;font-size:13px;color:#12446b;font-weight:700}
+.overlay{position:absolute;inset:0;background:#082744b8;display:flex;align-items:center;justify-content:center;z-index:5;padding:20px}.modal{background:#102d50;border:3px solid #8deaff;border-radius:20px;padding:24px;text-align:center;max-width:330px;width:100%;box-shadow:0 10px 0 #155d8a}.modal h2{font-size:30px;margin:0 0 8px}.modal p{line-height:1.5}.hidden{display:none!important}
+@media(max-width:760px){body{overflow:auto}.top{padding:10px}.stats{font-size:12px}main{grid-template-columns:1fr;padding:5px 10px}.menu{grid-template-columns:repeat(3,1fr);gap:8px}.menu button{padding:10px 6px;text-align:center;font-size:14px}.menu button:last-child{display:none}.arena{min-height:390px}.side{display:none}.bottom{padding:0 12px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="logo">KEYBOARD <span>DASH!</span></div><div class="stats">🏁 Stage <span id="stage">1</span> &nbsp; ⭐ <span id="score">0</span></div></header>
+<main>
+<aside class="panel menu">
+<button id="play">▶ Play / Restart</button><button id="skins">🎨 Change Color</button><button id="help">❔ How to Play</button><button id="sound">🔊 Sound: Off</button>
+<p class="small">Quick fingers win! Hit the correct key to dash to the next platform.</p>
+</aside>
+<section class="arena" id="arena" aria-label="Keyboard Dash game">
+<div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+<div class="prompt" id="prompt">Press <span class="key" id="nextKey">A</span> to start your run!</div>
+<div class="track" id="track"></div><div class="runner" id="runner">🏃</div>
+<div class="overlay" id="overlay"><div class="modal"><h2 id="modalTitle">KEYBOARD DASH!</h2><p id="modalText">Press the letter shown on the screen to dash forward. Wrong key? Your run ends. How far can you go?</p><button id="start">LET'S GO! 🚀</button></div></div>
+</section>
+<aside class="panel side"><h3>🏆 Run Stats</h3><div class="row"><span>Best stage</span><b id="best">0</b></div><div class="row"><span>Current streak</span><b id="streak">0</b></div><div class="row"><span>Keys hit</span><b id="hits">0</b></div><p class="small">Tip: Keep your eyes on the big letter. The pace gets faster as you level up!</p><div class="score" id="badge">READY?</div></aside>
+</main>
+<div class="bottom">Made for fun • Use your keyboard (A–Z) or tap the big letter on screen.</div>
+<script>
+const $=id=>document.getElementById(id);
+const letters='ASDFJKLQWERUIOPZXCVBNM';
+let running=false, stage=1, score=0, streak=0, hits=0, best=0, target='A', sound=false, color=0, speedTimer=null;
+const colors=['#ffcf23','#ff4fc8','#45ef67','#16baff','#ad7aff'];
+function newTarget(){target=letters[Math.floor(Math.random()*letters.length)];$('nextKey').textContent=target;}
+function drawTrack(){ $('track').innerHTML=''; for(let i=0;i<8;i++){let t=document.createElement('div');t.className='tile';t.style.setProperty('--h',(20+i*6)+'%');t.textContent=i===Math.min(stage-1,7)?target:'';$('track').appendChild(t);} }
+function update(){ $('stage').textContent=stage;$('score').textContent=score;$('streak').textContent=streak;$('hits').textContent=hits;$('best').textContent=best;$('badge').textContent=running?'DASHING!':'READY?'; }
+function startGame(){running=true;stage=1;score=0;streak=0;hits=0;newTarget();drawTrack();$('overlay').classList.add('hidden');$('prompt').innerHTML='Press <span class="key" id="nextKey">'+target+'</span> to dash!';update();}
+function endGame(message){running=false;best=Math.max(best,stage-1);$('modalTitle').textContent='RUN OVER! 💥';$('modalText').textContent=message+' You reached stage '+stage+' and scored '+score+'. Try again and beat your best!';$('start').textContent='RUN IT BACK!';$('overlay').classList.remove('hidden');update();}
+function pressKey(k){if(!running)return;if(k.toUpperCase()===target){stage++;score+=10+streak;streak++;hits++;newTarget();drawTrack();$('prompt').innerHTML='NICE! ⚡ Press <span class="key" id="nextKey">'+target+'</span>!';$('runner').style.bottom=(24+Math.min(streak,8))+'%';update();if(stage%5===0){$('prompt').innerHTML='🔥 STREAK '+streak+'! Press <span class="key" id="nextKey">'+target+'</span>!';}}else{streak=0;endGame('Oops! You pressed '+k.toUpperCase()+', but the key was '+target+'.');}}
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey)return;if(e.key.length===1&&/[a-z]/i.test(e.key)){e.preventDefault();pressKey(e.key);}});
+$('start').onclick=startGame;$('play').onclick=startGame;
+$('skins').onclick=()=>{color=(color+1)%colors.length;$('runner').style.filter='drop-shadow(0 5px 1px #14507866) hue-rotate('+(color*65)+'deg)';$('prompt').style.borderColor=colors[color];};
+$('help').onclick=()=>{running=false;$('modalTitle').textContent='HOW TO PLAY 🎮';$('modalText').textContent='Press the exact letter shown at the top. Every correct key moves you forward and adds points. A wrong letter ends the run. You can also tap the letter prompt on a phone. Good luck!';$('start').textContent='GOT IT — PLAY!';$('overlay').classList.remove('hidden');};
+$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'🔇 Sound: Off':'🔊 Sound: Off';};
+$('prompt').addEventListener('click',()=>pressKey(target));
+drawTrack();update();
+</script>
+</body></html>
